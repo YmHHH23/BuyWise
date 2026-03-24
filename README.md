@@ -1,6 +1,6 @@
 # BuyWise
 
-![Project Cover](Images/Project_cover.jpg)
+![Project Cover](Images/Project_cover.png)
 
 BuyWise is a Chrome extension + FastAPI app powered by ASI1 for product intelligence on Amazon pages.
 
@@ -86,13 +86,13 @@ BuyWise/
 
 ### Widget View
 
-![Extension Layout](Images/Sample_extension_layout.jpg)
+![Extension Layout](Images/Sample_extension_layout.png)
 
 ### Dashboard - Product PK
 
-![Product Example 1](Images/Sample_ProductPK1.jpg)
+![Product Example 1](Images/Sample_ProductPK1.png)
 
-![Product Example 2](Images/Sample_ProductPK2.jpg)
+![Product Example 2](Images/Sample_ProductPK2.png)
 
 ---
 
