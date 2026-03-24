@@ -2,7 +2,7 @@
 
 ![Project Cover](Images/Project_cover.jpg)
 
-BuyWise is a Chrome extension + FastAPI app powered by Amazon Bedrock for product intelligence on Amazon pages.
+BuyWise is a Chrome extension + FastAPI app powered by ASI1 for product intelligence on Amazon pages.
 
 ### 3-Minute Demo Video
 
@@ -21,7 +21,7 @@ Core capabilities:
 ## 1) Project Structure
 
 ```text
-ShopSence-based-on-Nova2-lite/
+BuyWise/
 ├── frontend/
 │   ├── manifest.json
 │   ├── background.js
@@ -100,7 +100,7 @@ ShopSence-based-on-Nova2-lite/
 
 - **Extension Frontend**: Manifest V3, Vanilla JavaScript, CSS
 - **Backend**: FastAPI, Uvicorn
-- **LLM**: Amazon Bedrock `global.amazon.nova-2-lite-v1:0`
+- **LLM**: ASI1 `asi1`
 
 ---
 
@@ -117,14 +117,15 @@ Dependencies:
 
 - `fastapi`
 - `uvicorn[standard]`
-- `boto3`
+- `requests`
 - `python-dotenv`
 - `python-multipart`
 
 Environment:
 
-- `AWS_REGION` (read in code)
-- AWS credentials (env vars or local AWS profile)
+- `ASI1_API_KEY`
+- `ASI1_BASE_URL` (optional, default: `https://api.asi1.ai/v1`)
+- `ASI1_MODEL` (optional, default: `asi1`)
 
 Run:
 
@@ -253,13 +254,13 @@ Dashboard only reads from `chrome.storage.local`.
 
 Reload extension in `chrome://extensions/`, then refresh the target tab / reopen dashboard.
 
-### Bedrock request fails
+### ASI1 request fails
 
 Check:
 
-- `AWS_REGION`
-- AWS credentials
-- Bedrock model access permission
+- `ASI1_API_KEY` is set correctly in `backend/.env`
+- `ASI1_BASE_URL` is reachable
+- API key has permission to call model `asi1`
 
 ---
 
