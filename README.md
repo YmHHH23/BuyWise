@@ -6,7 +6,7 @@ BuyWise is a Chrome extension + FastAPI app powered by ASI1 for product intellig
 
 ### 3-Minute Demo Video
 
-[Watch on YouTube](https://youtu.be/fm6O3CD6oHo)
+[Watch on YouTube](https://youtu.be/NYBPWtpeLhM)
 
 Core capabilities:
 
