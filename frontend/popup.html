@@ -1,0 +1,346 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BuyWise</title>
+    <style>
+      :root {
+        --bg: #f8fafc;
+        --text: #1e293b;
+        --muted: #64748b;
+        --primary: #4f46e5;
+        --primary-hover: #4338ca;
+        --panel: #ffffff;
+        --border: #e2e8f0;
+        --ring: rgba(79, 70, 229, 0.35);
+        --assistant-bg: #eef2ff;
+        --assistant-text: #1e1b4b;
+        --user-bg: #4f46e5;
+        --user-text: #ffffff;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-width: 360px;
+        background: var(--bg);
+        color: var(--text);
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+          Arial, sans-serif;
+      }
+
+      main {
+        padding: 18px;
+      }
+
+      header {
+        margin-bottom: 18px;
+      }
+
+      h1 {
+        margin: 0;
+        color: var(--primary);
+        font-size: 20px;
+        font-weight: 700;
+        letter-spacing: -0.01em;
+      }
+
+      .subtitle {
+        margin-top: 6px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      #summarizeBtn {
+        width: 100%;
+        border: none;
+        border-radius: 10px;
+        background: var(--primary);
+        color: #fff;
+        padding: 11px 14px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.2s ease, transform 0.08s ease, box-shadow 0.2s ease;
+        box-shadow: 0 8px 20px rgba(79, 70, 229, 0.2);
+      }
+
+      #chatBtn {
+        width: 100%;
+        margin-top: 10px;
+        border: 1px solid #c7d2fe;
+        border-radius: 10px;
+        background: #eef2ff;
+        color: #3730a3;
+        padding: 10px 14px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+      }
+
+      #chatBtn:hover {
+        background: #e0e7ff;
+      }
+
+      #summarizeBtn:hover {
+        background: var(--primary-hover);
+      }
+
+      #summarizeBtn:active {
+        transform: translateY(1px);
+      }
+
+      #summarizeBtn:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 3px var(--ring);
+      }
+
+      #summarizeBtn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+
+      #loadingSpinner {
+        margin-top: 10px;
+        padding: 8px 10px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        background: var(--panel);
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      #loadingSpinner.hidden {
+        display: none;
+      }
+
+      .spinner-dot {
+        width: 16px;
+        height: 16px;
+        border-radius: 999px;
+        border: 2px solid #cbd5e1;
+        border-top-color: var(--primary);
+        animation: spin 0.8s linear infinite;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      section {
+        margin-top: 10px;
+      }
+
+      #result {
+        min-height: 60px;
+        max-height: 170px;
+        overflow-y: auto;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        background: var(--panel);
+        padding: 12px;
+        color: #334155;
+        font-size: 13px;
+        line-height: 1.5;
+      }
+
+      .status-text {
+        color: var(--muted);
+        margin: 0;
+      }
+
+      .result-card {
+        border-radius: 10px;
+        border: 1px solid;
+        padding: 10px;
+      }
+
+      .result-card.success {
+        border-color: #c7d2fe;
+        background: #eef2ff;
+        color: #1f2937;
+      }
+
+      .result-card.error {
+        border-color: #fecaca;
+        background: #fef2f2;
+        color: #991b1b;
+      }
+
+      .result-label {
+        margin: 0 0 6px;
+        color: #4338ca;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .ai-markdown h3,
+      .ai-markdown h4 {
+        margin: 8px 0 6px;
+        color: #0f172a;
+      }
+
+      .ai-markdown h3 {
+        font-size: 14px;
+      }
+
+      .ai-markdown h4 {
+        font-size: 13px;
+      }
+
+      .ai-markdown p {
+        margin: 0 0 8px;
+      }
+
+      .ai-markdown ul,
+      .ai-markdown ol {
+        margin: 4px 0 10px 18px;
+        padding: 0;
+      }
+
+      .ai-markdown li {
+        margin: 4px 0;
+      }
+
+      .ai-markdown hr {
+        border: none;
+        border-top: 1px solid #cbd5e1;
+        margin: 8px 0;
+      }
+
+      .chat-shell {
+        margin-top: 12px;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        background: var(--panel);
+        padding: 10px;
+      }
+
+      .chat-title {
+        margin: 0 0 8px;
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      #chatHistory {
+        min-height: 120px;
+        max-height: 180px;
+        overflow-y: auto;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 10px;
+      }
+
+      .chat-bubble {
+        max-width: 88%;
+        border-radius: 12px;
+        padding: 8px 10px;
+        margin-bottom: 8px;
+        font-size: 13px;
+        line-height: 1.45;
+        white-space: pre-wrap;
+      }
+
+      .chat-bubble.user {
+        margin-left: auto;
+        background: var(--user-bg);
+        color: var(--user-text);
+        border-bottom-right-radius: 4px;
+      }
+
+      .chat-bubble.assistant {
+        margin-right: auto;
+        background: var(--assistant-bg);
+        color: var(--assistant-text);
+        border-bottom-left-radius: 4px;
+      }
+
+      .chat-bubble.error {
+        margin-right: auto;
+        background: #fef2f2;
+        color: #b91c1c;
+        border: 1px solid #fecaca;
+      }
+
+      .chat-input-row {
+        margin-top: 8px;
+        display: flex;
+        gap: 8px;
+      }
+
+      #chatInput {
+        flex: 1;
+        border: 1px solid #cbd5e1;
+        border-radius: 9px;
+        padding: 9px 10px;
+        font-size: 13px;
+      }
+
+      #chatInput:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 3px var(--ring);
+      }
+
+      #sendBtn {
+        border: none;
+        border-radius: 9px;
+        background: #111827;
+        color: #fff;
+        padding: 0 12px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+      }
+
+      #sendBtn:disabled {
+        opacity: 0.65;
+        cursor: not-allowed;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>BuyWise</h1>
+        <p class="subtitle">Instant AI summary for the current Amazon product page.</p>
+      </header>
+
+      <button id="summarizeBtn">Summarize Current Product</button>
+      <button id="chatBtn" type="button">Chat with Reviews</button>
+
+      <div id="loadingSpinner" class="hidden">
+        <span class="spinner-dot" aria-hidden="true"></span>
+        <span>Generating summary...</span>
+      </div>
+
+      <section>
+        <div id="result"><p class="status-text">Open an Amazon product page, then click "Summarize Current Product".</p></div>
+      </section>
+
+      <section class="chat-shell">
+        <p class="chat-title">Chat with Reviews</p>
+        <div id="chatHistory">
+          <div class="chat-bubble assistant">Ask me anything about this product based on its reviews.</div>
+        </div>
+        <div class="chat-input-row">
+          <input id="chatInput" type="text" placeholder="e.g. Is this durable for frequent travel?" />
+          <button id="sendBtn" type="button">Send</button>
+        </div>
+      </section>
+    </main>
+
+    <script src="popup.js"></script>
+  </body>
+</html>
