@@ -1,6 +1,6 @@
 import os
 
-import boto3
+import requests
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -59,25 +59,34 @@ def build_chat_prompt(payload: ChatRequest) -> str:
     )
 
 
-def get_bedrock_client():
-    return boto3.client(
-        "bedrock-runtime",
-        region_name=os.getenv("AWS_REGION"),
-    )
+def invoke_asi1(prompt: str) -> str:
+    api_key = os.getenv("ASI1_API_KEY")
+    if not api_key:
+        raise RuntimeError("Missing ASI1_API_KEY in environment.")
 
+    base_url = os.getenv("ASI1_BASE_URL", "https://api.asi1.ai/v1").rstrip("/")
+    model_name = os.getenv("ASI1_MODEL", "asi1")
 
-def invoke_bedrock(prompt: str) -> str:
-    client = get_bedrock_client()
-    response = client.converse(
-        modelId="global.amazon.nova-2-lite-v1:0",
-        messages=[
-            {
-                "role": "user",
-                "content": [{"text": prompt}],
-            }
-        ],
+    response = requests.post(
+        f"{base_url}/chat/completions",
+        headers={
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json",
+        },
+        json={
+            "model": model_name,
+            "messages": [{"role": "user", "content": prompt}],
+            "temperature": 0,
+        },
+        timeout=45,
     )
-    return response["output"]["message"]["content"][0]["text"]
+    response.raise_for_status()
+    data = response.json()
+
+    try:
+        return data["choices"][0]["message"]["content"]
+    except (KeyError, IndexError, TypeError) as exc:
+        raise RuntimeError(f"Unexpected ASI1 response format: {data}") from exc
 
 
 @app.post("/api/analyze")
@@ -85,9 +94,9 @@ def analyze_product(payload: ProductRequest) -> dict[str, str]:
     prompt_string = build_prompt(payload)
 
     try:
-        output_text = invoke_bedrock(prompt_string)
+        output_text = invoke_asi1(prompt_string)
     except Exception as exc:
-        raise HTTPException(status_code=500, detail=f"Bedrock request failed: {exc}") from exc
+        raise HTTPException(status_code=500, detail=f"ASI1 request failed: {exc}") from exc
 
     return {"result": output_text}
 
@@ -101,8 +110,8 @@ def chat_with_reviews(payload: ChatRequest) -> dict[str, str]:
 
     prompt_string = build_chat_prompt(payload)
     try:
-        output_text = invoke_bedrock(prompt_string)
+        output_text = invoke_asi1(prompt_string)
     except Exception as exc:
-        raise HTTPException(status_code=500, detail=f"Bedrock request failed: {exc}") from exc
+        raise HTTPException(status_code=500, detail=f"ASI1 request failed: {exc}") from exc
 
     return {"answer": output_text}
